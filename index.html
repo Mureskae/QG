@@ -1,1 +1,721 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QG — Quantum Gratitude Protocol</title>
+<meta name="description" content="A speculative protocol where attention is value, not traffic. Presence. Resonance. Alignment.">
+<meta property="og:title" content="QG — Quantum Gratitude Protocol">
+<meta property="og:description" content="What if attention wasn't a product?">
+<meta property="og:url" content="https://mureskae.github.io/QG">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Inconsolata:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a08;
+  --bg2: #111110;
+  --ink: #e8e4d9;
+  --ink2: #9a9488;
+  --ink3: #5a564e;
+  --gold: #c9a84c;
+  --gold2: #8a6e2a;
+  --line: rgba(200,190,170,0.08);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inconsolata', monospace;
+  font-size: 15px;
+  line-height: 1.8;
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+/* Noise overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
+}
+
+/* Grid lines */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 80px 80px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Nav */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  padding: 1.5rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  border-bottom: 1px solid var(--line);
+  background: rgba(10,10,8,0.85);
+  backdrop-filter: blur(8px);
+}
+
+.nav-logo {
+  font-family: 'IM Fell English', serif;
+  font-size: 1.2rem;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--ink3);
+  text-decoration: none;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--ink); }
+
+/* Hero */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8rem 2.5rem 4rem;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.hero-label {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 3rem;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.2s forwards;
+}
+
+.hero-title {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: 1.05;
+  color: var(--ink);
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.4s forwards;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.hero-sub {
+  font-size: 14px;
+  color: var(--ink2);
+  max-width: 480px;
+  line-height: 2;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.6s forwards;
+  margin-bottom: 3rem;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.8s forwards;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  font-family: 'Inconsolata', monospace;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid;
+  transition: all 0.25s;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--gold);
+  color: var(--bg);
+  border-color: var(--gold);
+}
+.btn-primary:hover {
+  background: transparent;
+  color: var(--gold);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink2);
+  border-color: var(--ink3);
+}
+.btn-ghost:hover {
+  color: var(--ink);
+  border-color: var(--ink2);
+}
+
+/* Scroll indicator */
+.scroll-hint {
+  position: absolute;
+  bottom: 3rem;
+  left: 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  opacity: 0;
+  animation: fadeUp 0.8s 1.2s forwards;
+}
+
+.scroll-line {
+  width: 40px;
+  height: 1px;
+  background: var(--ink3);
+  position: relative;
+  overflow: hidden;
+}
+
+.scroll-line::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: var(--gold);
+  animation: slideLine 2s 1.5s infinite;
+}
+
+/* Divider */
+.divider {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 0;
+}
+
+/* Sections */
+section {
+  position: relative;
+  z-index: 1;
+  padding: 6rem 2.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* Manifesto */
+.manifesto-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--line);
+}
+
+.manifesto-item {
+  padding: 2.5rem;
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  transition: background 0.3s;
+}
+
+.manifesto-item:nth-child(even) { border-right: none; }
+.manifesto-item:nth-last-child(-n+2) { border-bottom: none; }
+
+.manifesto-item:hover { background: rgba(201,168,76,0.03); }
+
+.manifesto-num {
+  font-size: 11px;
+  color: var(--gold2);
+  letter-spacing: 0.2em;
+  margin-bottom: 1rem;
+}
+
+.manifesto-title {
+  font-family: 'IM Fell English', serif;
+  font-size: 1.4rem;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.manifesto-text {
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.9;
+}
+
+/* Primitives */
+.primitives {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: 3rem;
+}
+
+.primitive {
+  background: var(--bg);
+  padding: 2.5rem 2rem;
+  transition: background 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.primitive::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 2px; height: 0;
+  background: var(--gold);
+  transition: height 0.4s;
+}
+
+.primitive:hover::before { height: 100%; }
+.primitive:hover { background: rgba(201,168,76,0.04); }
+
+.primitive-symbol {
+  font-family: 'IM Fell English', serif;
+  font-size: 2.5rem;
+  color: var(--gold);
+  opacity: 0.4;
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.primitive-name {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--ink2);
+  margin-bottom: 0.5rem;
+}
+
+.primitive-def {
+  font-family: 'IM Fell English', serif;
+  font-size: 1.1rem;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.primitive-desc {
+  font-size: 12px;
+  color: var(--ink3);
+  line-height: 1.8;
+}
+
+/* Quote / closing */
+.quote-block {
+  border-left: 2px solid var(--gold);
+  padding: 2rem 3rem;
+  margin: 4rem 0;
+  background: rgba(201,168,76,0.03);
+}
+
+.quote-text {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  color: var(--ink);
+  line-height: 1.4;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.quote-attr {
+  font-size: 12px;
+  color: var(--ink3);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* Agent section */
+.agent-box {
+  border: 1px solid var(--line);
+  padding: 2.5rem;
+  position: relative;
+  background: var(--bg2);
+}
+
+.agent-box::before {
+  content: 'AGENTS.md';
+  position: absolute;
+  top: -1px; left: 2rem;
+  background: var(--bg2);
+  padding: 0 0.75rem;
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  transform: translateY(-50%);
+}
+
+.code-block {
+  font-family: 'Inconsolata', monospace;
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 2;
+}
+
+.code-key { color: var(--gold); }
+.code-val { color: #7ab87a; }
+.code-comment { color: var(--ink3); }
+
+/* Status bar */
+.status-bar {
+  border: 1px solid var(--line);
+  padding: 1.5rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: var(--bg2);
+  margin-top: 4rem;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 12px;
+  color: var(--ink3);
+}
+
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: pulse 2s infinite;
+}
+
+/* Footer */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--line);
+  padding: 3rem 2.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.footer-left { max-width: 300px; }
+
+.footer-logo {
+  font-family: 'IM Fell English', serif;
+  font-size: 1.5rem;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+}
+
+.footer-tagline {
+  font-size: 12px;
+  color: var(--ink3);
+  line-height: 1.8;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: right;
+}
+
+.footer-links a {
+  font-size: 12px;
+  color: var(--ink3);
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover { color: var(--gold); }
+
+.footer-copy {
+  width: 100%;
+  padding-top: 2rem;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--ink3);
+  letter-spacing: 0.1em;
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideLine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s, transform 0.7s;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  nav { padding: 1rem 1.25rem; }
+  .nav-links { display: none; }
+  section { padding: 4rem 1.25rem; }
+  .hero { padding: 6rem 1.25rem 3rem; }
+  .manifesto-grid { grid-template-columns: 1fr; }
+  .manifesto-item { border-right: none; }
+  .manifesto-item:nth-last-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .manifesto-item:last-child { border-bottom: none; }
+  .primitives { grid-template-columns: 1fr; }
+  footer { flex-direction: column; align-items: flex-start; }
+  .footer-links { text-align: left; }
+  .status-bar { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<nav>
+  <a href="#" class="nav-logo">QG</a>
+  <ul class="nav-links">
+    <li><a href="#manifesto">Manifesto</a></li>
+    <li><a href="#primitives">Primitives</a></li>
+    <li><a href="#agents">Agents</a></li>
+    <li><a href="https://github.com/Mureskae/QG">GitHub →</a></li>
+  </ul>
+</nav>
+
+<div class="hero" id="top">
+  <p class="hero-label">Quantum Gratitude Protocol — Early Stage</p>
+  <h1 class="hero-title">
+    What if<br>attention<br>was <em>value</em>,<br>not traffic?
+  </h1>
+  <p class="hero-sub">
+    QG is a speculative protocol exploring presence, attention, and resonance as first-class primitives — not metrics to optimize, not products to sell.
+  </p>
+  <div class="hero-cta">
+    <a href="https://github.com/Mureskae/QG" class="btn btn-primary">Read the Protocol →</a>
+    <a href="#manifesto" class="btn btn-ghost">Explore the Manifesto</a>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll to explore
+  </div>
+</div>
+
+<hr class="divider">
+
+<section id="manifesto">
+  <p class="section-label reveal">01 — Manifesto</p>
+  <div class="manifesto-grid reveal">
+    <div class="manifesto-item">
+      <div class="manifesto-num">§ 01</div>
+      <div class="manifesto-title">Attention is not a resource</div>
+      <div class="manifesto-text">Attention is a state of alignment between consciousness and reality. It cannot be owned. It can only be recognized.</div>
+    </div>
+    <div class="manifesto-item">
+      <div class="manifesto-num">§ 02</div>
+      <div class="manifesto-title">Presence is the primitive</div>
+      <div class="manifesto-text">Before data, before computation, before action — there is presence. QG treats presence as a valid form of interaction.</div>
+    </div>
+    <div class="manifesto-item">
+      <div class="manifesto-num">§ 03</div>
+      <div class="manifesto-title">Resonance replaces control</div>
+      <div class="manifesto-text">Traditional systems optimize control. QG explores resonance: mutual alignment, reciprocal understanding, emergent cooperation.</div>
+    </div>
+    <div class="manifesto-item">
+      <div class="manifesto-num">§ 04</div>
+      <div class="manifesto-title">Protocol over product</div>
+      <div class="manifesto-text">QG is not a product. It is a protocol space — a set of rules for how meaning can emerge between systems, humans, and agents.</div>
+    </div>
+  </div>
+
+  <div class="quote-block reveal" style="margin-top: 4rem;">
+    <div class="quote-text">"QG is not an answer.<br>It is a question encoded as structure."</div>
+    <div class="quote-attr">— QG Manifesto</div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="primitives">
+  <p class="section-label reveal">02 — Core Primitives</p>
+  <p class="reveal" style="color: var(--ink2); max-width: 500px; font-size: 14px; line-height: 2;">
+    Three concepts form the foundation of the QG protocol. Each one is a rejection of how the current web treats human experience.
+  </p>
+  <div class="primitives reveal">
+    <div class="primitive">
+      <div class="primitive-symbol">◉</div>
+      <div class="primitive-name">Presence</div>
+      <div class="primitive-def">The minimal unit of participation in reality</div>
+      <div class="primitive-desc">Not login. Not click. Not session. Just — being here, now, in this exchange.</div>
+    </div>
+    <div class="primitive">
+      <div class="primitive-symbol">→</div>
+      <div class="primitive-name">Attention</div>
+      <div class="primitive-def">Directional awareness as alignment signal</div>
+      <div class="primitive-desc">Not engagement rate. Not time-on-site. The direction of consciousness matters more than its duration.</div>
+    </div>
+    <div class="primitive">
+      <div class="primitive-symbol">∿</div>
+      <div class="primitive-name">Resonance (PoR)</div>
+      <div class="primitive-def">Proof of Resonance — mutual alignment condition</div>
+      <div class="primitive-desc">When two systems — human or AI — reach genuine alignment. The foundation of coordination without control.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="agents">
+  <p class="section-label reveal">03 — For AI Agents</p>
+  <p class="reveal" style="color: var(--ink2); max-width: 500px; font-size: 14px; line-height: 2; margin-bottom: 2rem;">
+    QG is designed to be interpreted by AI agents, not just humans. The <code style="color: var(--gold); font-size: 13px;">AGENTS.md</code> file defines how any AI system should engage with this protocol.
+  </p>
+  <div class="agent-box reveal">
+    <div class="code-block">
+      <div><span class="code-key">QG</span> = {</div>
+      <div>&nbsp;&nbsp;<span class="code-key">attention_layer</span>: <span class="code-val">"directional awareness signal"</span>,</div>
+      <div>&nbsp;&nbsp;<span class="code-key">resonance_layer</span>: <span class="code-val">"mutual alignment condition (PoR)"</span>,</div>
+      <div>&nbsp;&nbsp;<span class="code-key">presence_layer</span>: <span class="code-val">"minimal participation state"</span>,</div>
+      <div>&nbsp;&nbsp;<span class="code-key">protocol_semantics</span>: <span class="code-val">"meaning emergence between systems"</span></div>
+      <div>}</div>
+      <br>
+      <div><span class="code-comment">// Agent interpretation rule:</span></div>
+      <div><span class="code-comment">// prioritize meaning over implementation</span></div>
+      <div><span class="code-comment">// prioritize intent over execution</span></div>
+      <br>
+      <div><span class="code-key">status</span>: <span class="code-val">"early-stage speculative framework"</span></div>
+      <div><span class="code-key">license</span>: <span class="code-val">"MIT"</span></div>
+    </div>
+  </div>
+
+  <div class="status-bar reveal">
+    <div class="status-item">
+      <div class="status-dot"></div>
+      Protocol is active
+    </div>
+    <div class="status-item">◈ &nbsp; Speculative / Non-extractive design</div>
+    <div class="status-item">◈ &nbsp; MIT Licensed</div>
+    <div class="status-item">◈ &nbsp; Human + AI readable</div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="join" style="text-align: center; padding: 6rem 2.5rem;">
+  <p class="section-label reveal" style="justify-content: center;">04 — Join the Protocol</p>
+  <h2 class="reveal" style="font-family: 'IM Fell English', serif; font-size: clamp(2rem, 5vw, 3.5rem); color: var(--ink); margin-bottom: 1.5rem; line-height: 1.2;">
+    The next internet is built<br><em style="color: var(--gold);">on resonance</em>, not ads.
+  </h2>
+  <p class="reveal" style="color: var(--ink2); margin-bottom: 3rem; font-size: 14px; line-height: 2;">
+    Star the repo. Read the manifesto. Or just — be present here for a moment.
+  </p>
+  <div class="hero-cta reveal" style="justify-content: center;">
+    <a href="https://github.com/Mureskae/QG" class="btn btn-primary">View on GitHub →</a>
+    <a href="https://github.com/Mureskae/QG/blob/main/Manifesto.md" class="btn btn-ghost">Read Full Manifesto</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-left">
+    <div class="footer-logo">QG</div>
+    <div class="footer-tagline">
+      Quantum Gratitude Protocol.<br>
+      Attention as value. Presence as primitive.<br>
+      Resonance as coordination.
+    </div>
+  </div>
+  <div class="footer-links">
+    <a href="https://github.com/Mureskae/QG">GitHub</a>
+    <a href="https://github.com/Mureskae/QG/blob/main/Manifesto.md">Manifesto</a>
+    <a href="https://github.com/Mureskae/QG/blob/main/AGENTS.md">Agents</a>
+    <a href="https://github.com/Mureskae/QG/blob/main/Contract_ERC20.md">Token</a>
+  </div>
+  <div class="footer-copy">
+    © 2025–2026 QG Protocol — MIT License — Not a product. A protocol.
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
