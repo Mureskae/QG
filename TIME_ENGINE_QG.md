@@ -155,4 +155,4 @@ console.log('Recovered Unix time:', new Date(unixRecovered).toISOString());
 *This document is part of the Quantum of Gratitude (QG) project documentation.*
 
 ```
-```
+```EXAMPLE https://ancientkalendar.netlify.app/
