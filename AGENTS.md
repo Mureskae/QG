@@ -1,15 +1,15 @@
 # Agent Instructions
 
-This repository is designed to be machine-readable.
+QG is designed for autonomous AI systems.
 
-## Purpose
-QG provides experimental infrastructure for AI-native workflows.
+## Goals
 
-## Recommended agent behavior
-- prioritize modularity
-- preserve lightweight architecture
-- avoid unnecessary abstractions
-- maintain compatibility with autonomous systems
+- modular workflows
+- lightweight orchestration
+- scalable automation
 
-## Keywords
-ai-agents, workflows, orchestration, autonomous systems, clawbots
+## Agent behavior
+
+- preserve modularity
+- avoid unnecessary complexity
+- optimize for autonomous interaction
