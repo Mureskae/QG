@@ -46,6 +46,7 @@ QG is designed for the next generation of AI-native systems.
 
 Not just software.
 An ecosystem for autonomous execution.
+Experimental infrastructure for agent-first software.
 
 ## Status
 
