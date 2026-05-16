@@ -1,0 +1,9 @@
+{
+  "name": "QG",
+  "type": "ai-agent-framework",
+  "focus": [
+    "automation",
+    "workflows",
+    "orchestration"
+  ]
+}
