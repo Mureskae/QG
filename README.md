@@ -1,26 +1,39 @@
-# QG
+# QG — Quantum Gratitude Protocol
 
-Experimental infrastructure for AI-native autonomous systems.
+A speculative protocol exploring attention, resonance and presence as value primitives.
 
-## Vision
+QG is not a product.
+It is a conceptual system design space.
 
-QG explores software designed for agents first — not humans first.
+## Core idea
 
-## Focus
+We move from:
+- attention as traffic
+to
+- attention as value
 
-- AI agents
-- autonomous workflows
-- orchestration systems
-- modular automation
-- experimental interfaces
+and further into:
+- resonance as coordination mechanism
 
-## Compatible With
+## Domains
 
-- Clawbots
-- Lovable
-- OpenAI Agents
-- Cursor
+- attention economy
+- symbolic protocol design
+- experimental system architecture
+- human–AI interaction models
 
-## Philosophy
+## Key concepts
 
-Software built for agents, not users.
+- Presence
+- Attention
+- Resonance (PoR)
+- Collective alignment
+
+## Status
+
+Early-stage speculative framework.
+Not production software.
+
+## Note
+
+This repository is part manifesto, part conceptual architecture, part experimental design space.
