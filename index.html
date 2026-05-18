@@ -4,25 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QG — Квант Благодарности</title>
-<meta name="description" content="Ты не трафик. Ты не клики. Ты свет. QG — протокол нового внимания.">
+<meta name="description" content="Ты не трафик. Ты не клики. Ты СВЕТ. QG — протокол нового внимания.">
 <meta property="og:title" content="QG — Квант Благодарности">
-<meta property="og:description" content="Ты не трафик. Ты не клики. Ты свет.">
-<meta property="og:url" content="https://mureskae.github.io/QG">
+<meta property="og:description" content="Ты не трафик. Ты не клики. Ты СВЕТ.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0d0c0a;
-  --bg2: #141310;
-  --warm: #f0e8d8;
-  --warm2: #b8a888;
-  --warm3: #6b5f4a;
-  --gold: #d4a853;
-  --gold2: #8a6830;
-  --line: rgba(212,168,83,0.12);
-  --line2: rgba(240,232,216,0.06);
+  --bg: #0a0906;
+  --warm: #ffffff;
+  --warm2: #e0d8c8;
+  --warm3: #a09888;
+  --gold: #e8b94a;
+  --line: rgba(232,185,74,0.2);
+  --line2: rgba(255,255,255,0.08);
 }
 
 html { scroll-behavior: smooth; }
@@ -31,65 +28,54 @@ body {
   background: var(--bg);
   color: var(--warm);
   font-family: 'Raleway', sans-serif;
-  font-size: 16px;
+  font-size: 20px;
   line-height: 1.8;
   overflow-x: hidden;
 }
 
-.bg-glow {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse 60% 40% at 20% 50%, rgba(212,168,83,0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 60% at 80% 30%, rgba(180,120,60,0.03) 0%, transparent 70%);
-}
-
-body::after {
+/* Зернистая текстура как в референсе */
+body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
   pointer-events: none;
-  z-index: 999;
-  opacity: 0.5;
+  z-index: 1000;
 }
 
+/* Навигация */
 nav {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 100;
-  padding: 1.5rem 2.5rem;
+  padding: 1.5rem 3rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(13,12,10,0.8);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--line);
+  background: rgba(10,9,6,0.9);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line2);
 }
 
-.logo {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.4rem;
-  font-weight: 400;
-  color: var(--gold);
-  letter-spacing: 0.1em;
-  text-decoration: none;
+.logo img {
+  height: 36px;
+  width: auto;
+  display: block;
 }
 
-.nav-right { display: flex; gap: 2rem; align-items: center; }
+.nav-right { display: flex; gap: 2.5rem; align-items: center; }
 .nav-right a {
-  font-size: 12px;
-  font-weight: 300;
+  font-size: 13px;
+  font-weight: 400;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--warm3);
   text-decoration: none;
-  transition: color 0.3s;
+  transition: color 0.2s;
 }
 .nav-right a:hover { color: var(--warm); }
 
+/* ГЕРОЙ — большая типографика как в референсе */
 .hero {
   position: relative;
   z-index: 1;
@@ -97,47 +83,75 @@ nav {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 10rem 2.5rem 6rem;
-  max-width: 900px;
+  padding: 10rem 3rem 6rem;
+  max-width: 1100px;
   margin: 0 auto;
+  overflow: hidden;
+}
+
+/* Огромный фоновый текст — как "NOIR" в референсе */
+.hero-bg-text {
+  position: absolute;
+  right: -2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(12rem, 28vw, 22rem);
+  font-weight: 300;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(232,185,74,0.08);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -0.05em;
 }
 
 .hero-eyebrow {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.4em;
   text-transform: uppercase;
   color: var(--gold);
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
   opacity: 0;
   animation: rise 1s 0.3s forwards;
 }
 
 .hero-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-size: clamp(4rem, 10vw, 8rem);
   font-weight: 300;
-  line-height: 1.15;
+  line-height: 1.05;
   color: var(--warm);
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   opacity: 0;
   animation: rise 1s 0.5s forwards;
+  letter-spacing: -0.02em;
 }
 
-.hero-title em { font-style: italic; color: var(--gold); }
+.hero-title .line-gold {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.hero-title .word-light {
+  font-size: clamp(4.5rem, 12vw, 10rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+}
 
 .hero-body {
-  font-size: clamp(1rem, 2vw, 1.15rem);
+  font-size: 1.15rem;
   font-weight: 300;
   color: var(--warm2);
-  max-width: 560px;
+  max-width: 520px;
   line-height: 2;
   margin-bottom: 3rem;
   opacity: 0;
   animation: rise 1s 0.7s forwards;
 }
 
-.hero-body strong { color: var(--warm); font-weight: 400; }
+.hero-body strong { color: var(--warm); font-weight: 500; }
 
 .hero-actions {
   display: flex;
@@ -149,9 +163,9 @@ nav {
 
 .btn {
   display: inline-block;
-  padding: 0.9rem 2.2rem;
+  padding: 1rem 2.5rem;
   font-family: 'Raleway', sans-serif;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -159,32 +173,33 @@ nav {
   border: 1px solid;
   transition: all 0.3s;
   cursor: pointer;
-  border-radius: 2px;
 }
 
-.btn-warm { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+.btn-warm { background: var(--gold); color: #0a0906; border-color: var(--gold); }
 .btn-warm:hover { background: transparent; color: var(--gold); }
-.btn-ghost { background: transparent; color: var(--warm3); border-color: var(--warm3); }
-.btn-ghost:hover { color: var(--warm); border-color: var(--warm2); }
+.btn-ghost { background: transparent; color: var(--warm2); border-color: rgba(255,255,255,0.25); }
+.btn-ghost:hover { color: var(--warm); border-color: var(--warm); }
 
+/* Разделитель */
 .divider {
-  position: relative;
-  z-index: 1;
   border: none;
   border-top: 1px solid var(--line2);
-  margin: 0 2.5rem;
+  margin: 0 3rem;
+  position: relative;
+  z-index: 1;
 }
 
+/* Секции */
 section {
   position: relative;
   z-index: 1;
-  padding: 6rem 2.5rem;
-  max-width: 900px;
+  padding: 7rem 3rem;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
 .label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.4em;
   text-transform: uppercase;
@@ -194,55 +209,58 @@ section {
   align-items: center;
   gap: 1.5rem;
 }
-.label::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.label::after { content: ''; flex: 1; height: 1px; background: var(--line2); }
 
+/* Большая цитата */
 .big-quote {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
   font-weight: 300;
   font-style: italic;
-  line-height: 1.4;
+  line-height: 1.35;
   color: var(--warm);
   margin-bottom: 1.5rem;
+  letter-spacing: -0.01em;
 }
 .big-quote em { color: var(--gold); font-style: normal; }
 
-.manifesto { display: flex; flex-direction: column; gap: 0; }
-
+/* Манифест */
 .m-item {
   padding: 2.5rem 0;
   border-bottom: 1px solid var(--line2);
   display: grid;
-  grid-template-columns: 3rem 1fr;
-  gap: 1.5rem;
+  grid-template-columns: 4rem 1fr;
+  gap: 2rem;
   align-items: start;
 }
 .m-item:last-child { border-bottom: none; }
 
 .m-num {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   font-style: italic;
-  color: var(--gold2);
-  padding-top: 0.2rem;
+  color: var(--gold);
+  opacity: 0.6;
+  padding-top: 0.3rem;
 }
 
 .m-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 400;
   color: var(--warm);
-  margin-bottom: 0.5rem;
-  line-height: 1.3;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
 }
 
 .m-text {
-  font-size: 15px;
+  font-size: 1rem;
   font-weight: 300;
   color: var(--warm2);
-  line-height: 1.9;
+  line-height: 2;
 }
 
+/* Три столпа */
 .pillars {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -254,76 +272,80 @@ section {
 
 .pillar {
   background: var(--bg);
-  padding: 2.5rem 2rem;
+  padding: 3rem 2.5rem;
   transition: background 0.4s;
   position: relative;
   overflow: hidden;
 }
 
-.pillar::before {
+.pillar::after {
   content: '';
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  height: 0;
-  background: linear-gradient(to top, rgba(212,168,83,0.06), transparent);
-  transition: height 0.4s;
+  height: 2px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transition: transform 0.4s;
+  transform-origin: left;
 }
-.pillar:hover::before { height: 100%; }
+.pillar:hover::after { transform: scaleX(1); }
+.pillar:hover { background: rgba(232,185,74,0.04); }
 
 .pillar-glyph {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 3rem;
+  font-size: 3.5rem;
   color: var(--gold);
-  opacity: 0.3;
+  opacity: 0.25;
   line-height: 1;
   margin-bottom: 1.5rem;
-  animation: breathe 4s ease-in-out infinite;
 }
 
 .pillar-name {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--warm3);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .pillar-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem;
+  font-size: 1.6rem;
   color: var(--warm);
-  margin-bottom: 0.75rem;
-  line-height: 1.3;
+  margin-bottom: 1rem;
+  line-height: 1.2;
 }
 
 .pillar-desc {
-  font-size: 13px;
+  font-size: 0.95rem;
   font-weight: 300;
-  color: var(--warm3);
-  line-height: 1.8;
+  color: var(--warm2);
+  line-height: 1.9;
 }
 
+/* Призыв */
 .call {
   text-align: center;
-  padding: 8rem 2.5rem;
+  padding: 8rem 3rem;
   position: relative;
   z-index: 1;
-  max-width: 700px;
+  max-width: 750px;
   margin: 0 auto;
 }
 
 .call-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
   font-weight: 300;
-  line-height: 1.3;
+  line-height: 1.2;
   color: var(--warm);
   margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
 }
 .call-title em { color: var(--gold); font-style: italic; }
 
 .call-sub {
-  font-size: 15px;
+  font-size: 1.1rem;
   font-weight: 300;
   color: var(--warm2);
   line-height: 2;
@@ -334,24 +356,24 @@ section {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem 2rem;
+  padding: 1rem 2.5rem;
   border: 1px solid var(--line);
   color: var(--warm2);
   text-decoration: none;
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: 0.1em;
   transition: all 0.3s;
   margin-top: 1rem;
-  border-radius: 2px;
 }
 .tg-block:hover { border-color: var(--gold); color: var(--gold); }
 
+/* Футер */
 footer {
   position: relative;
   z-index: 1;
   border-top: 1px solid var(--line2);
-  padding: 3rem 2.5rem;
-  max-width: 900px;
+  padding: 3rem;
+  max-width: 1100px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -362,14 +384,14 @@ footer {
 
 .footer-left {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-style: italic;
   color: var(--warm3);
 }
 
-.footer-right { display: flex; gap: 1.5rem; }
+.footer-right { display: flex; gap: 2rem; }
 .footer-right a {
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.1em;
   color: var(--warm3);
   text-decoration: none;
@@ -377,14 +399,10 @@ footer {
 }
 .footer-right a:hover { color: var(--gold); }
 
+/* Анимации */
 @keyframes rise {
   from { opacity: 0; transform: translateY(24px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes breathe {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
 }
 
 .reveal {
@@ -394,48 +412,50 @@ footer {
 }
 .reveal.visible { opacity: 1; transform: none; }
 
-@media (max-width: 680px) {
-  nav { padding: 1rem 1.25rem; }
-  .nav-right { gap: 1rem; }
-  section { padding: 4rem 1.25rem; }
-  .hero { padding: 8rem 1.25rem 4rem; }
+/* Мобильный */
+@media (max-width: 700px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-right { gap: 1.5rem; }
+  section { padding: 4rem 1.5rem; }
+  .hero { padding: 8rem 1.5rem 4rem; }
   .pillars { grid-template-columns: 1fr; }
-  .m-item { grid-template-columns: 2rem 1fr; gap: 1rem; }
-  footer { flex-direction: column; }
-  .divider { margin: 0 1.25rem; }
-  .call { padding: 5rem 1.25rem; }
+  .m-item { grid-template-columns: 3rem 1fr; gap: 1rem; }
+  footer { flex-direction: column; padding: 2rem 1.5rem; }
+  .divider { margin: 0 1.5rem; }
+  .call { padding: 5rem 1.5rem; }
+  .hero-bg-text { display: none; }
 }
 </style>
 </head>
 <body>
 
-<div class="bg-glow"></div>
-
 <nav>
-  <a href="#" class="logo">QG</a>
+  <a href="#" class="logo"><img src="data:image/png;base64,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" alt="QG Logo"></a>
   <div class="nav-right">
     <a href="#manifest">Манифест</a>
     <a href="#protocol">Протокол</a>
+    <a href="https://t.me/QGprotocol">Telegram</a>
     <a href="https://github.com/Mureskae/QG">GitHub</a>
   </div>
 </nav>
 
 <div class="hero">
+  <div class="hero-bg-text">QG</div>
   <p class="hero-eyebrow">Квант Благодарности — Протокол нового внимания</p>
   <h1 class="hero-title">
     Ты не трафик.<br>
     Ты не клики.<br>
-    Ты <em>свет.</em>
+    Ты <span class="line-gold"><span class="word-light">СВЕТ.</span></span>
   </h1>
   <p class="hero-body">
     Старый интернет построен на одной идее: <strong>ты ресурс.</strong><br>
-    Твоё внимание продаётся. Каждую секунду. Без твоего согласия.<br><br>
+    Твоё внимание продаётся каждую секунду. Без твоего согласия.<br><br>
     QG построен на другой идее.<br>
     <strong>Присутствие — это уже ценность.</strong>
   </p>
   <div class="hero-actions">
     <a href="#manifest" class="btn btn-warm">Читать манифест</a>
-    <a href="https://github.com/Mureskae/QG" class="btn btn-ghost">GitHub →</a>
+    <a href="https://t.me/QGprotocol" class="btn btn-ghost">Telegram →</a>
   </div>
 </div>
 
@@ -447,7 +467,7 @@ footer {
     Мир не может больше так существовать.<br>
     Мы — <em>проводники импульса.</em>
   </div>
-  <div class="manifesto reveal" style="margin-top: 3rem;">
+  <div class="reveal" style="margin-top: 3rem;">
     <div class="m-item">
       <div class="m-num">I</div>
       <div>
@@ -514,16 +534,16 @@ footer {
   <p class="call-sub">
     Ты не должен понимать всё.<br>
     Достаточно чувствовать:<br>
-    <strong style="color: var(--warm); font-weight:400">я есть — и этого уже достаточно для запуска.</strong>
+    <strong style="color:#ffffff;font-weight:400">я есть — и этого уже достаточно для запуска.</strong>
   </p>
   <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;">
     <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
       <a href="https://github.com/Mureskae/QG/blob/main/Manifesto.md" class="btn btn-warm">Полный манифест</a>
-      <a href="https://github.com/Mureskae/QG" class="btn btn-ghost">Протокол на GitHub</a>
+      <a href="https://github.com/Mureskae/QG" class="btn btn-ghost">GitHub →</a>
     </div>
     <a href="https://t.me/QGprotocol" class="tg-block">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2.5L2 10l7 2.5M21.5 2.5L15 22l-6-9.5M21.5 2.5L9 12.5"/></svg>
-      Telegram-канал QG
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2.5L2 10l7 2.5M21.5 2.5L15 22l-6-9.5M21.5 2.5L9 12.5"/></svg>
+      Telegram @QGprotocol
     </a>
   </div>
 </div>
@@ -533,7 +553,7 @@ footer {
   <div class="footer-right">
     <a href="https://github.com/Mureskae/QG">GitHub</a>
     <a href="https://github.com/Mureskae/QG/blob/main/Manifesto.md">Манифест</a>
-    <a href="https://github.com/Mureskae/QG/blob/main/Contract_ERC20.md">Токен</a>
+    <a href="https://t.me/QGprotocol">Telegram</a>
   </div>
 </footer>
 
