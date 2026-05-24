@@ -289,13 +289,14 @@ class QGMoniitor {
     }
 
     async processFrame(qTime) {
-        this.canvas.width = 100;
-        this.canvas.height = 100;
-        this.ctx.drawImage(this.video,
-            this.video.videoWidth / 2 - 50, this.video.videoHeight / 2 - 50, 100, 100,
-            0, 0, 100, 100);
+        // Sample full screen at reduced resolution for performance
+        const sw = Math.min(this.video.videoWidth, 320);
+        const sh = Math.min(this.video.videoHeight, 180);
+        this.canvas.width = sw;
+        this.canvas.height = sh;
+        this.ctx.drawImage(this.video, 0, 0, this.video.videoWidth, this.video.videoHeight, 0, 0, sw, sh);
 
-        const frame = this.ctx.getImageData(0, 0, 100, 100);
+        const frame = this.ctx.getImageData(0, 0, sw, sh);
         let r = 0, g = 0, b = 0;
         for (let i = 0; i < frame.data.length; i += 4) {
             r += frame.data[i]; g += frame.data[i+1]; b += frame.data[i+2];
@@ -303,7 +304,9 @@ class QGMoniitor {
         const px = frame.data.length / 4;
         const avgR = r / px, avgG = g / px, avgB = b / px;
 
-        const alpha = await this.transmutor.calculateWeights(qTime.hours, qTime.parts, qTime.fractions, Math.random());
+        // Seed from time only — no randomness, so R/G/B weights differ by channel
+        const timeSeed = qTime.hours * 10000 + qTime.parts * 100 + qTime.fractions;
+        const alpha = await this.transmutor.calculateWeights(qTime.hours, qTime.parts, qTime.fractions, timeSeed);
         this.energy = this.transmutor.calculateEnergy({ r: avgR, g: avgG, b: avgB });
 
         const resonance = await this.por.computeResonance(qTime, this.energy, alpha);
