@@ -358,6 +358,11 @@ class QGMoniitor {
         document.getElementById('bal-r').textContent = Math.floor(this.balance.r);
         document.getElementById('bal-g').textContent = Math.floor(this.balance.g);
         document.getElementById('bal-b').textContent = Math.floor(this.balance.b);
+        // Обновляем верхние счётчики на странице
+        if (typeof window.updateTopCounters === 'function') {
+            window.updateTopCounters(this.distribution, this.energy);
+        }
+
         document.getElementById('resonance-debug').textContent =
             `PoR [Ω]: ${resonance.omega} · X: [${resonance.x.join(', ')}]`;
 
