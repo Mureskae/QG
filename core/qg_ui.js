@@ -19,6 +19,14 @@ class QGMoniitor {
         this.balance = { r: 0, g: 0, b: 0, qg: 0 };
         this.lastResonance = null;
 
+        // Распределение токенов 45% / 45% / 10%
+        this.distribution = {
+            holder:   { share: 0.45, label: 'Держатель (ты)', r: 0, g: 0, b: 0 },
+            creator:  { share: 0.45, label: 'Автор контента', r: 0, g: 0, b: 0 },
+            platform: { share: 0.10, label: 'Платформа',      r: 0, g: 0, b: 0 },
+        };
+        this.distributionLog = []; // хранит последние 100 записей
+
         this.initUI();
         this.startHeartbeat();
     }
@@ -219,6 +227,36 @@ class QGMoniitor {
                 </div>
             </div>
 
+            <!-- Распределение токенов -->
+            <div style="margin-bottom:1.5rem">
+                <div style="font-family:Arial,sans-serif;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(232,185,74,0.5);margin-bottom:0.75rem;text-align:center">
+                    Распределение токенов
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.06);margin-bottom:1rem">
+                    <div style="background:#0a0906;padding:0.9rem 0.5rem;text-align:center">
+                        <div style="font-family:Arial,sans-serif;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:0.3rem">Держатель · 45%</div>
+                        <div style="font-family:'Courier New',monospace;font-size:1rem;color:#e8b94a" id="dist-holder">0</div>
+                    </div>
+                    <div style="background:#0a0906;padding:0.9rem 0.5rem;text-align:center;border-left:1px solid rgba(255,255,255,0.06);border-right:1px solid rgba(255,255,255,0.06)">
+                        <div style="font-family:Arial,sans-serif;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:0.3rem">Автор · 45%</div>
+                        <div style="font-family:'Courier New',monospace;font-size:1rem;color:#00dd88" id="dist-creator">0</div>
+                    </div>
+                    <div style="background:#0a0906;padding:0.9rem 0.5rem;text-align:center">
+                        <div style="font-family:Arial,sans-serif;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:0.3rem">Платформа · 10%</div>
+                        <div style="font-family:'Courier New',monospace;font-size:1rem;color:#0088ff" id="dist-platform">0</div>
+                    </div>
+                </div>
+
+                <!-- Лог -->
+                <div style="border:1px solid rgba(255,255,255,0.06);background:#000">
+                    <div style="font-family:Arial,sans-serif;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.2);padding:0.5rem 0.75rem;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;justify-content:space-between;align-items:center">
+                        <span>QG Distribution Log</span>
+                        <span id="log-count" style="color:rgba(232,185,74,0.4)">0 записей</span>
+                    </div>
+                    <div id="dist-log" style="height:120px;overflow-y:auto;padding:0.5rem 0.75rem;font-family:'Courier New',monospace;font-size:10px;color:rgba(255,255,255,0.25);line-height:1.8"></div>
+                </div>
+            </div>
+
             <div class="por-debug" id="resonance-debug">PoR: ожидание резонанса...</div>
 
             <div class="qg-controls">
@@ -322,6 +360,52 @@ class QGMoniitor {
         document.getElementById('bal-b').textContent = Math.floor(this.balance.b);
         document.getElementById('resonance-debug').textContent =
             `PoR [Ω]: ${resonance.omega} · X: [${resonance.x.join(', ')}]`;
+
+        // Распределение: накапливаем по долям
+        const earned = { r: (avgR / 255) * this.energy, g: (avgG / 255) * this.energy, b: (avgB / 255) * this.energy };
+        for (const [key, party] of Object.entries(this.distribution)) {
+            party.r += earned.r * party.share;
+            party.g += earned.g * party.share;
+            party.b += earned.b * party.share;
+        }
+
+        // Обновляем UI распределения
+        const h = this.distribution.holder, c = this.distribution.creator, p = this.distribution.platform;
+        document.getElementById('dist-holder').textContent =
+            `R:${Math.floor(h.r)} G:${Math.floor(h.g)} B:${Math.floor(h.b)}`;
+        document.getElementById('dist-creator').textContent =
+            `R:${Math.floor(c.r)} G:${Math.floor(c.g)} B:${Math.floor(c.b)}`;
+        document.getElementById('dist-platform').textContent =
+            `R:${Math.floor(p.r)} G:${Math.floor(p.g)} B:${Math.floor(p.b)}`;
+
+        // Пишем в лог каждые ~3 секунды (каждые ~47 кадров при 64ms)
+        this.frameCount = (this.frameCount || 0) + 1;
+        if (this.frameCount % 47 === 0) {
+            const t = this.timeEngine.getQGTime();
+            const entry = {
+                time: t.toString(),
+                energy: this.energy.toFixed(4),
+                holder:   { r: Math.floor(h.r), g: Math.floor(h.g), b: Math.floor(h.b) },
+                creator:  { r: Math.floor(c.r), g: Math.floor(c.g), b: Math.floor(c.b) },
+                platform: { r: Math.floor(p.r), g: Math.floor(p.g), b: Math.floor(p.b) },
+            };
+            this.distributionLog.unshift(entry); // новые сверху
+            if (this.distributionLog.length > 100) this.distributionLog.pop();
+
+            // Рендерим лог
+            const logEl = document.getElementById('dist-log');
+            const countEl = document.getElementById('log-count');
+            countEl.textContent = `${this.distributionLog.length} записей`;
+            logEl.innerHTML = this.distributionLog.map(e =>
+                `<div style="border-bottom:1px solid rgba(255,255,255,0.04);padding:2px 0">` +
+                `<span style="color:rgba(232,185,74,0.5)">${e.time}</span> ` +
+                `<span style="color:rgba(255,255,255,0.35)">E:${e.energy}</span> ` +
+                `<span style="color:#e8b94a">H[${e.holder.r},${e.holder.g},${e.holder.b}]</span> ` +
+                `<span style="color:#00dd88">C[${e.creator.r},${e.creator.g},${e.creator.b}]</span> ` +
+                `<span style="color:#0088ff">P[${e.platform.r},${e.platform.g},${e.platform.b}]</span>` +
+                `</div>`
+            ).join('');
+        }
     }
 
     drawLightHash() {
