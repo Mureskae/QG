@@ -1,0 +1,52 @@
+name: QG Protocol CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-docs:
+    name: Validate documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Markdown files exist
+        run: |
+          echo "Checking required files..."
+          for f in README.md CONTRIBUTING.md LICENSE Manifesto.md; do
+            if [ -f "$f" ]; then
+              echo "✅ $f"
+            else
+              echo "❌ Missing: $f"
+              exit 1
+            fi
+          done
+
+      - name: Check for empty files
+        run: |
+          echo "Checking for empty files..."
+          find . -name "*.md" -not -path "./.git/*" | while read f; do
+            size=$(wc -c < "$f")
+            if [ "$size" -lt 10 ]; then
+              echo "⚠️  Warning: $f appears empty or too short"
+            else
+              echo "✅ $f ($size bytes)"
+            fi
+          done
+
+  welcome:
+    name: Welcome new contributors
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: |
+            👋 Thanks for your first contribution to QG!
+
+            QG is a speculative space — your perspective matters here.
+            A maintainer will review and respond shortly.
