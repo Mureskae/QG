@@ -1,39 +1,75 @@
 # QG — Quantum Gratitude Protocol
 
-A speculative protocol exploring attention, resonance and presence as value primitives.
+> *What if attention were the currency, and presence the proof of work?*
 
-QG is not a product.
-It is a conceptual system design space.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Status: Speculative](https://img.shields.io/badge/status-speculative-blueviolet)]()
+[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen)](CONTRIBUTING.md)
 
-## Core idea
+---
 
-We move from:
-- attention as traffic
-to
-- attention as value
+## What is this?
 
-and further into:
-- resonance as coordination mechanism
+QG is a speculative protocol that reframes how we think about value in digital systems.
 
-## Domains
+The dominant model treats **attention as traffic** — something to capture, optimize, monetize.
 
-- attention economy
-- symbolic protocol design
-- experimental system architecture
-- human–AI interaction models
+QG proposes an alternative:
 
-## Key concepts
+| Current paradigm | QG paradigm |
+|---|---|
+| Attention = resource to extract | Attention = state of alignment |
+| Engagement = metric | Presence = primitive |
+| Control = coordination | Resonance = coordination |
 
-- Presence
-- Attention
-- Resonance (PoR)
-- Collective alignment
+This is not a product. It is a conceptual design space — part manifesto, part architecture, part open question.
+
+---
+
+## Core concepts
+
+- **Presence** — the minimal unit of participation. Before data, before action.
+- **Attention** — a state of alignment between consciousness and reality. Cannot be owned, only recognized.
+- **Resonance (PoR)** — mutual alignment as a coordination mechanism, replacing control.
+- **Collective alignment** — emergent cooperation between agents, humans, and environments.
+
+→ Full exploration in [Manifesto.md](Manifesto.md)  
+→ Protocol design in [`/protocol`](protocol/)  
+→ Key concepts in [`/concepts`](concepts/)  
+→ Model specification in [QG_Model_Spec.md](QG_Model_Spec.md)
+
+---
+
+## Why it matters
+
+The attention economy extracts. Social platforms, recommendation engines, and engagement loops are built on the assumption that human attention is a raw material.
+
+QG asks: what if we designed systems the other way around?
+
+Future AI systems, multi-agent architectures, and human–computer interfaces will need new primitives for coordination. QG is an attempt to name those primitives before the defaults get locked in.
+
+---
 
 ## Status
 
-Early-stage speculative framework.
-Not production software.
+Early-stage speculative framework. Not production software.
 
-## Note
+This repository is a living document — structure and ideas evolve through commits and discussions.
 
-This repository is part manifesto, part conceptual architecture, part experimental design space.
+---
+
+## How to engage
+
+You don't need to write code to contribute.
+
+- **Discuss** — open an [Issue](../../issues) to challenge, extend, or question any idea
+- **Write** — contribute a concept, counter-argument, or use case via PR
+- **Think** — fork it, remix it, build something adjacent
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+---
+
+## License
+
+[MIT](LICENSE) — open for exploration, extension, and critique.
