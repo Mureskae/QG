@@ -1,79 +1,61 @@
 
 # QG — Quantum Gratitude Protocol
 
-> What if attention were the currency, and presence the proof of work?
+A speculative protocol exploring attention, resonance and presence as value primitives.
 
----
+QG is not a product.
+It is a conceptual system design space, split into two layers:
 
-## What is this?
+- **Philosophy layer** — manifesto, motivating ideas, metaphors. Not falsifiable, not meant to be.
+- **Spec layer** — formal definitions, computable functions, reference implementation. Meant to be falsifiable and testable.
 
-QG is a speculative protocol that treats **attention, resonance, and presence** as fundamental value primitives in digital systems.
+## Repository map
 
-The dominant attention economy extracts value from human focus. QG proposes an alternative architecture where **presence** is the base unit, **attention** is a state of alignment, and **resonance** becomes the primary coordination mechanism.
+| Layer | File | Purpose |
+|---|---|---|
+| Philosophy | `Manifesto.md` | Motivating narrative, why this design space matters |
+| Philosophy | `QG_ONE_LINER.md` | One-sentence framing |
+| Philosophy | `Executive Summary` | Non-technical overview |
+| Spec | `QG_Model_Spec.md` | Formal model: state vector, resonance function, definitions |
+| Spec | `QG_RGB_attention_model_en.md` | Attention model formalization |
+| Spec | `TIME_ENGINE_QG.md` | Temporal dynamics component |
+| Spec | `Contract_ERC20.md` | Token mechanics (if/when implemented) |
+| Code | `core/`, `protocol/` | Reference implementation (in progress) |
+| Meta | `AGENTS.md`, `agents.json` | Agent-facing instructions/config |
 
-This repository serves as a living design space — part conceptual framework, part technical specification, part open research.
+## Core idea
 
----
+We move from:
+- attention as traffic
+to
+- attention as value
 
-## Core Concepts
+and further into:
+- resonance as coordination mechanism
 
-- **Presence** — the minimal unit of participation. Before data, before action.
-- **Attention** — a state of alignment between consciousness and reality.
-- **Resonance (PoR)** — mutual alignment as a coordination primitive, replacing traditional control structures.
-- **J-space Integration** — incorporation of the internal "global workspace" of large language models (Anthropic, 2026) into the resonance model.
+## Domains
 
----
+- attention economy
+- symbolic protocol design
+- experimental system architecture
+- human–AI interaction models
 
-## Theoretical Connections
+## Key concepts
 
-- [GAME-THEORY-CONNECTION.md](GAME-THEORY-CONNECTION.md) — связь с теорией игр
-- [MECHANISM-DESIGN-CONNECTION.md](MECHANISM-DESIGN-CONNECTION.md) — связь с теорией механизмов
-- [STRATEGY-PROOFNESS.md](STRATEGY-PROOFNESS.md) — анализ strategy-proofness
-
----
-
-## Technical Direction (uPoR-J)
-
-We are developing **Unified Proof-of-Resonance** with the following building blocks:
-
-- Post-quantum cryptography (LWE lattice-based)
-- Atomic time anchoring (physical phase instead of Unix timestamps)
-- Multi-dimensional resonance function (currently 7D with J-space component)
-- SNARK proofs for verifiable resonance
-- RGB-J measurement layer — using screen state as a physical anchor to model internal AI workspace
-
-Detailed technical documents:
-- [J-SPACE-INTEGRATION.md](J-SPACE-INTEGRATION.md)
-- [LAGRANGIAN-FORMULATION.md](LAGRANGIAN-FORMULATION.md)
-- [TEMPORAL-DYNAMICS.md](TEMPORAL-DYNAMICS.md)
-- [TOKENOMICS.md](TOKENOMICS.md)
-
----
-
-## Why it matters
-
-Future AI systems, multi-agent architectures, and human–computer interfaces will need new primitives for coordination. QG is an attempt to define those primitives before the defaults get locked in.
-
----
+- Presence
+- Attention
+- Resonance (PoR)
+- Collective alignment
 
 ## Status
 
-Early-stage speculative research. Not production-ready software.  
-The repository evolves through iterative documentation and discussion.
+Early-stage speculative framework. Philosophy layer is stable; spec layer is under active formalization — see individual files for which parts have a reference implementation and which are still notation without code.
 
----
+Not production software.
 
-## How to engage
+## Note
 
-You don’t need to write code.
-
-- Open an [Issue](https://github.com/Mureskae/QG/issues) to discuss, critique, or extend ideas
-- Submit a PR with new concepts or refinements
-- Fork and build adjacent experiments
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-
----
+This repository is part manifesto, part conceptual architecture, part experimental design space. Files in the "Spec" row above are held to a stricter bar: every term must be defined, every formula must have a corresponding runnable implementation in `core/` or `protocol/`, or it's marked as **unimplemented**.
 
 ## License
 
