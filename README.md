@@ -76,5 +76,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 [MIT](LICENSE) — open for exploration, critique, and extension.
 
----
 
