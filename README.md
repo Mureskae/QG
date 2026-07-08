@@ -1,3 +1,4 @@
+
 # QG — Quantum Gratitude Protocol
 
 > What if attention were the currency, and presence the proof of work?
@@ -23,6 +24,14 @@ This repository serves as a living design space — part conceptual framework, p
 
 ---
 
+## Theoretical Connections
+
+- [GAME-THEORY-CONNECTION.md](GAME-THEORY-CONNECTION.md) — связь с теорией игр
+- [MECHANISM-DESIGN-CONNECTION.md](MECHANISM-DESIGN-CONNECTION.md) — связь с теорией механизмов
+- [STRATEGY-PROOFNESS.md](STRATEGY-PROOFNESS.md) — анализ strategy-proofness
+
+---
+
 ## Technical Direction (uPoR-J)
 
 We are developing **Unified Proof-of-Resonance** with the following building blocks:
@@ -33,7 +42,7 @@ We are developing **Unified Proof-of-Resonance** with the following building blo
 - SNARK proofs for verifiable resonance
 - RGB-J measurement layer — using screen state as a physical anchor to model internal AI workspace
 
-Detailed explorations:
+Detailed technical documents:
 - [J-SPACE-INTEGRATION.md](J-SPACE-INTEGRATION.md)
 - [LAGRANGIAN-FORMULATION.md](LAGRANGIAN-FORMULATION.md)
 - [TEMPORAL-DYNAMICS.md](TEMPORAL-DYNAMICS.md)
@@ -43,13 +52,7 @@ Detailed explorations:
 
 ## Why it matters
 
-Future AI systems and multi-agent environments will require new primitives for coordination that go beyond tokens, votes, or engagement metrics. QG is an attempt to define those primitives early.
-
-We explore the intersection of:
-- Attention economics
-- Interpretability research (J-space)
-- Post-quantum cryptography
-- Human-AI symbiosis
+Future AI systems, multi-agent architectures, and human–computer interfaces will need new primitives for coordination. QG is an attempt to define those primitives before the defaults get locked in.
 
 ---
 
@@ -75,5 +78,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 ## License
 
 [MIT](LICENSE) — open for exploration, critique, and extension.
-
 
