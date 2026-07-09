@@ -1,38 +1,236 @@
+# QG Model Specification (uPoR — unified Proof-of-Resonance)
 
-# QG Model Specification (uPoR-J)
+**Version:** 0.4 (consolidated)
+**Status:** Working draft. Sections marked *(open)* are unresolved research
+problems, not implemented results. A reference implementation accompanies
+this spec (`qg_model.py`, `qgmath/`) and is the source of truth in any
+case of disagreement between prose and code.
 
-## Overview
+---
 
-Unified Proof-of-Resonance with J-space integration.
+## Abstract
 
-## Core Model
+This document specifies a state representation and a set of derived
+functions — *presence*, *resonance*, and *coherence* — intended to convert
+a stream of attention-related measurements into verifiable, quantized
+events. It supersedes earlier informal drafts that used undefined
+functions (`H()`, `δ()`, `f()`), an internally circular definition of
+resonance, and a dimensionally inconsistent gradient operator on a scalar
+time series. Every quantity below is either (a) fully defined in closed
+form, (b) implemented and unit-tested in the accompanying reference code,
+or (c) explicitly labeled *(open)* and excluded from any claim of
+completeness.
 
-**7-dimensional state vector:**
+---
 
-X = [T₁, T₂, T₃, R, Ω, T_atom, J]
+## 1. Notation and primitive quantities
 
-**Resonance function:**
+| Symbol | Domain | Description |
+|---|---|---|
+| $T_R, T_G, T_B$ | $[0,1]$ | Normalized RGB channel intensities, $T_c = \text{raw}_c / 65535$ for a 16-bit capture |
+| $M$ | $[0,1)$ | A session's Merkle root, mapped to the unit interval (§2.2) |
+| $T_{atom}$ | $[0,1)$ | Physical time, represented as a rolling-window-normalized count of Cs-133 hyperfine-transition periods (§2.1) |
+| $J$ | $[0,1)$ (approx.) | A scalar aggregate of a J-lens interpretability snapshot (§2.3) — **the aggregation function is not finalized; see §5.2** |
 
-Ω = H( Σ α_i T_i + R + β T_atom + γ J )
+No symbol above is reused for anything else in this document. (Earlier
+drafts used `R` simultaneously for a state coordinate, a Merkle root, and
+a token name; that collision is retired here — the token is named
+`Resonance Token (RT)`, never `R`.)
 
-## Key Components
+### 1.1 State vector
 
-- **LWE-based tokens** for post-quantum security
-- **Atomic time** as fundamental clock
-- **J-space projection** from LLM internal workspace
-- **SNARK proofs** for verifiable computation
-- **RGB-J measurement** as physical anchor for presence
+$$X = [T_R,\ T_G,\ T_B,\ M,\ T_{atom},\ J] \in [0,1]^6$$
 
-## Related Documents
+Six dimensions, not seven. $\Omega$ (resonance) is **not** a coordinate
+of $X$: it is a function of $X$, verified on demand, not stored as a free
+variable. (An earlier draft placed $\Omega$ inside the vector it was
+also computed from — a circular definition. This version removes that
+circularity entirely.)
 
-- [J-SPACE-INTEGRATION.md](../J-SPACE-INTEGRATION.md)
-- [TEMPORAL-DYNAMICS.md](../TEMPORAL-DYNAMICS.md)
-- [LAGRANGIAN-FORMULATION.md](../LAGRANGIAN-FORMULATION.md)
-- [TOKENOMICS.md](../TOKENOMICS.md)
-- [STRATEGY-PROOFNESS.md](../STRATEGY-PROOFNESS.md)
-- [MECHANISM-DESIGN-CONNECTION.md](../MECHANISM-DESIGN-CONNECTION.md)
+---
 
-## Status
+## 2. Primitive quantity definitions
 
-Speculative research model.  
-Evolving through discussion and formalization.
+### 2.1 Physical time — $T_{atom}$
+
+The SI second is defined as exactly **9,192,631,770** periods of the
+radiation corresponding to the hyperfine transition of the ground state
+of caesium-133 (Cs-133; BIPM, since 1967). This is not a design choice —
+it is the international definition of the second.
+
+$$\text{ticks}(s) = \text{round}(s \cdot 9{,}192{,}631{,}770)$$
+
+$$T_{atom} = \frac{\text{ticks} \bmod W}{W}, \quad W = \text{ticks}(\text{window\_seconds})$$
+
+for a chosen rolling window $W$ (e.g. one hour). The tick count is
+represented in base 16 for storage/display; this is purely a numeral-base
+choice and carries no further significance.
+
+*Caveat:* this specification does not perform TAI↔UTC leap-second
+conversion. A production implementation requires an authoritative
+leap-second table (e.g. IERS Bulletin C) to convert real-world
+timestamps into TAI seconds before ticking. See `SecondsToCs133Ticks()` /
+`seconds_to_cs133_ticks()` in the reference implementation for the exact
+boundary of what is and isn't handled.
+
+### 2.2 Merkle root — $M$
+
+$M$ is the Merkle root of a session's aggregated capture data, mapped to
+$[0,1)$ by:
+
+$$M = \min\left(\frac{\text{int}(\text{root}_{16}) \bmod 2^{256}}{2^{256}},\ 1 - 2^{-53}\right)$$
+
+The clamp at $1 - 2^{-53}$ exists because IEEE-754 double-precision floats
+carry only 53 bits of mantissa; without it, the maximal 256-bit root value
+rounds exactly to 1.0 and silently violates the stated $[0,1)$ contract.
+(This was found by property-testing the reference implementation, not by
+inspection — see `test_merkle_root_in_unit_interval`.)
+
+### 2.3 J-lens snapshot — $J$ *(partially open)*
+
+$J$ is intended to be a scalar summary of a J-lens reading (Anthropic,
+2026) — a sparse, partially interpretable projection of a language
+model's internal activations at a fixed layer, for a fixed, versioned
+model checkpoint.
+
+$$J = g(\text{raw J-lens activations})$$
+
+**Open problem:** $g()$ is not finalized. The reference implementation
+uses a placeholder ($L_2$ norm followed by $\tanh$ squashing) explicitly
+marked as such — it has not been justified as the correct aggregation and
+should not be treated as a settled design choice.
+
+**Explicit non-claim:** J-lens is an interpretability tool over model
+internals; the underlying research does not characterize it as detecting
+consciousness or subjective experience, and this specification makes no
+such claim. Any language suggesting otherwise belongs in a philosophy/
+manifesto document, not here.
+
+**Known limitation:** producing a zero-knowledge proof of $J$'s
+correctness would require proving a full language-model forward pass
+inside a SNARK circuit. This is not a solved problem in zkML at any
+practical model scale as of this writing. §5.1 records the current
+mitigation (trusted-oracle commit-reveal) as an explicitly interim,
+non-final architecture.
+
+---
+
+## 3. Derived quantities
+
+### 3.1 Presence
+
+$$P = w_R T_R + w_G T_G + w_B T_B, \qquad w_R + w_G + w_B = 1$$
+
+Default: $w_R = w_G = w_B = \tfrac{1}{3}$ (uncalibrated placeholder).
+
+### 3.2 Resonance
+
+$$\Omega = H\Big(k \cdot \big[\alpha(T_R{-}\tfrac12) + \beta(T_G{-}\tfrac12) + \gamma(T_B{-}\tfrac12) + \delta(M{-}\tfrac12) + \epsilon(T_{atom}{-}\tfrac12) + \zeta(J{-}\tfrac12)\big]\Big)$$
+
+where $H(x) = 1/(1+e^{-x})$ (logistic sigmoid) and $k$ is a gain constant.
+
+**Why the centering and gain terms are load-bearing, not cosmetic:**
+an earlier draft omitted both — $\Omega = H(\alpha T_R + \dots + \zeta J)$
+with non-negative terms summing to at most 1. Empirically (see the
+session-simulation script in the reference implementation), this
+collapses $\Omega$ into a narrow band (~0.57–0.65) regardless of the
+actual input, because a weighted sum of several bounded non-negative
+terms concentrates near its mean. Centering each term at zero and
+applying an explicit gain $k$ restores real dynamic range — verified by
+`test_omega_has_real_dynamic_range` / `TestOmegaHasRealDynamicRange` in
+both the Python and Go reference implementations. $k = 8.0$ is itself an
+unvalidated placeholder pending calibration against real data.
+
+### 3.3 Coherence
+
+Given a time-ordered sequence of $(t_i, J_i)$ samples (seconds, scalar):
+
+$$\text{coherence\_rate} = \max_i \left| \frac{J_{i+1} - J_i}{t_{i+1} - t_i} \right|$$
+
+A finite-difference time derivative, not a spatial gradient operator. An
+earlier draft used $\nabla J$ on what is actually a scalar sequence
+indexed by time — a type error, since $\nabla$ is defined for functions
+of several variables, not a time series. This version replaces it with
+the correct construct.
+
+---
+
+## 4. Token issuance conditions
+
+| Token | Condition | Notes |
+|---|---|---|
+| Presence Token (PT) | $P > \theta_P$ | $\theta_P = 0.5$, uncalibrated |
+| Resonance Token (RT) | $\Omega > \theta_\Omega$ | $\theta_\Omega = 0.5$, uncalibrated |
+| Coherence Token (CT) | $\text{coherence\_rate} < \varepsilon$ over a rolling window | $\varepsilon = 0.05$, uncalibrated |
+
+All thresholds are placeholders pending calibration against a labeled
+dataset. No claim is made that these specific values are meaningful in
+production.
+
+---
+
+## 5. Open problems (explicit, not hidden in prose)
+
+### 5.1 SNARK coverage does not extend to $J$'s computation
+
+Verifying $P$, $\Omega$, and the threshold comparisons in §4 in
+zero-knowledge is a modest circuit (arithmetic over fixed-point values).
+Verifying that a claimed $J$ value came from a genuine, correct J-lens
+readout over a specific model's forward pass is not — that would require
+proving LLM inference inside a SNARK, which is not achievable at
+practical scale today. **Interim mitigation:** $J$ is supplied by a
+trusted oracle (a designated model operator, with a public
+commit-reveal), and only the downstream arithmetic on $J$ is
+SNARK-verified. This is a centralization trade-off, stated plainly, not
+a decentralized design.
+
+### 5.2 $g()$ — the J-lens aggregation function — is unresolved
+
+See §2.3. Any specific functional form used before this is resolved
+should be treated as a placeholder.
+
+### 5.3 Weight and threshold calibration
+
+$\alpha, \beta, \gamma, \delta, \epsilon, \zeta, k, w_R, w_G, w_B,
+\theta_P, \theta_\Omega, \varepsilon$ are all currently equal-weight or
+round-number placeholders. None have been fit to real behavioral or
+interaction data. Treat any numeric claim derived from current defaults
+as illustrative only.
+
+### 5.4 Strategy-proofness
+
+A proof sketch exists (see `STRATEGY-PROOFNESS.md`) arguing informally
+that faking a high-resonance state without genuine engagement is
+computationally hard, by analogy to LWE hardness. This is *not* a formal
+reduction — no explicit polynomial-time reduction from a resonance-forging
+adversary to an LWE solver has been constructed. Treat this as a research
+direction, not a proven guarantee.
+
+---
+
+## 6. Reference implementation
+
+- `qg_model.py` / `test_qg_model.py` — Python reference implementation
+  and unit tests (20/20 passing at time of writing).
+- `qgmath/qgmath.go` / `qgmath/qgmath_test.go` — dependency-free Go port
+  of the same core math (12/12 tests passing), intended to be embedded in
+  a Cosmos SDK module keeper.
+
+Any formula in this document that disagrees with the reference
+implementation should be considered an error in this document; the code
+is authoritative.
+
+---
+
+## 7. Relationship to other documents in this repository
+
+- `Manifesto.md`, `QG_ONE_LINER.md`, `Executive Summary` — philosophy
+  layer. Motivating narrative, not falsifiable, not held to the bar in
+  this document.
+- `J-SPACE-INTEGRATION.md`, `TEMPORAL-DYNAMICS.md`,
+  `LAGRANGIAN-FORMULATION.md`, `GAME-THEORY-CONNECTION.md`,
+  `MECHANISM-DESIGN-CONNECTION.md`, `STRATEGY-PROOFNESS.md`,
+  `TOKENOMICS.md` — exploratory research notes. Each contains a mix of
+  legitimate terminology and unresolved gaps; none should be read as a
+  completed result unless it is reflected in this document and the
+  reference implementation.
