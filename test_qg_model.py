@@ -134,3 +134,35 @@ def test_evaluate_mint_thresholds():
 
 def test_sigmoid_midpoint():
     assert math.isclose(sigmoid(0.0), 0.5)
+
+
+def test_aggregate_j_oracles_uses_median():
+    from qg_model import OracleReading, aggregate_j_oracles
+    readings = [
+        OracleReading("op_a", 0.40),
+        OracleReading("op_b", 0.42),
+        OracleReading("op_c", 0.41),
+    ]
+    result = aggregate_j_oracles(readings, min_quorum=3, outlier_threshold=0.05)
+    assert math.isclose(result.aggregated_j, 0.41)
+    assert result.num_readings == 3
+    assert result.outlier_oracle_ids == []
+
+
+def test_aggregate_j_oracles_flags_outlier():
+    from qg_model import OracleReading, aggregate_j_oracles
+    readings = [
+        OracleReading("op_a", 0.40),
+        OracleReading("op_b", 0.41),
+        OracleReading("op_c", 0.95),  # dishonest/broken oracle
+    ]
+    result = aggregate_j_oracles(readings, min_quorum=3, outlier_threshold=0.05)
+    assert math.isclose(result.aggregated_j, 0.41)  # median unaffected
+    assert result.outlier_oracle_ids == ["op_c"]
+
+
+def test_aggregate_j_oracles_rejects_insufficient_quorum():
+    from qg_model import OracleReading, aggregate_j_oracles
+    readings = [OracleReading("op_a", 0.40), OracleReading("op_b", 0.41)]
+    with pytest.raises(ValueError):
+        aggregate_j_oracles(readings, min_quorum=3, outlier_threshold=0.05)
