@@ -1,46 +1,120 @@
-QG: Energy Attention Measurement Model through RGB Tokens
+# QG: Attention Measurement Model through RGB Channels
 
-Introduction
+*Note on formulas: plain text, not LaTeX — see `QG_Model_Spec.md` for why.*
 
-QG (Quantum Gratitude) is a system that measures a person's presence and interaction in digital space using three tokens (R, G, B). It is not limited to metaphysics: QG is based on real measurable quantities available with modern technology.
+## Introduction
 
-Main Idea
+QG (Quantum Gratitude) measures a person's presence and interaction in
+digital space using three raw signal channels (R, G, B). It is based on
+measurable quantities available with current technology.
 
-Every pixel, every color we perceive or generate carries the energy of attention. In QG, this energy is digitized and converted into three tokens: red (R), green (G), and blue (B). These tokens reflect not only the amount of attention but also the quality of interaction.
+## Main idea
 
-Interpretation of RGB Channels
+QG digitizes RGB channel intensity from a capture and uses it as a
+depersonalized attention-adjacent signal (see `QG_Model_Spec.md` §3.1
+for the tested Presence function built from these same channels).
 
-| Channel | Technical Measurement       | Energy in QG                             | Feature                             |
-|---------|----------------------------|----------------------------------------|-----------------------------------|
-| R (Red) | Red color intensity (0–65535) | Emotional energy — emotional response strength, passion, activity | Active engagement, motivation      |
-| G (Green) | Green color intensity (0–65535) | Cognitive energy — focus, balance, harmony | Connection of mind and perception  |
-| B (Blue) | Blue color intensity (0–65535) | Intuitive energy — calmness, depth of attention | Inner reflection, presence         |
+## Interpretation of RGB channels — corrected
 
-Mathematical Model
+**An earlier draft of this document labeled the channels "emotional
+energy," "cognitive energy," and "intuitive energy." That framing is
+retired.** Per the explicit non-claim in `QG_Model_Spec.md` §1: these
+are raw, normalized light-intensity channels — nothing more. QG makes
+no claim to infer emotion, cognition, or any other internal state from
+color data.
 
-Parameters:  
-- \( (R_t, G_t, B_t) \) — channel values at time \( t \) (0…65535)  
-- \( (W_r, W_g, W_b) \) — channel weight coefficients (e.g., \( W_r=1.2 \), \( W_g=1.0 \), \( W_b=0.8 \))  
-- \( C_h \) — attention flow coherence index (0…1)  
-- \( k \) — energy to QG token conversion coefficient  
-- \( T \) — measurement period  
+| Channel | Technical measurement | Role in QG |
+|---|---|---|
+| R (Red) | Intensity, 0–65535 | One of three inputs to Presence (`QG_Model_Spec.md` §3.1) and Resonance (§3.2) |
+| G (Green) | Intensity, 0–65535 | Same |
+| B (Blue) | Intensity, 0–65535 | Same |
 
-Energy of attention at time \( t \):  
-\[
-E_t = W_r R_t + W_g G_t + W_b B_t
-\]
+## Mathematical model
 
-Accumulated amount of QG tokens over period \( T \):  
-\[
-QG = \left( \sum_{t=0}^{T} E_t \right) C_h k
-\]
+**Relationship to `QG_Model_Spec.md`:** the spec's Presence function
+(§3.1) uses *normalized* channels `T_R = R/65535` etc. with weights
+summing to 1. The model below is a related but distinct proposal — an
+*accumulated* score over a time period, using unnormalized raw values
+and independently-chosen weights. Both should be reconciled before
+being treated as the same quantity; for now, treat this as a candidate
+extension, not an implemented part of the spec.
 
-Model Value
+Parameters:
 
-- Different channel weights allow adapting the system for various tasks (social networks, educational platforms, meditation practices).  
-- Coherence provides an assessment not only of quantity but also of the quality of attention.  
-- 16-bit color depth ensures ultra-precise measurements and opens up possibilities for new types of tokens.
+- `(R_t, G_t, B_t)` — channel values at time t (0…65535)
+- `(w_r, w_g, w_b)` — channel weight coefficients (example: w_r=1.2, w_g=1.0, w_b=0.8 — illustrative, not calibrated, and unlike `QG_Model_Spec.md` §3.1 these are not constrained to sum to 1)
+- `C_h` — attention-flow coherence index (0…1) — **see correction below**
+- `k` — energy-to-token conversion coefficient (uncalibrated placeholder)
+- `T` — measurement period
 
-Conclusion
+Attention signal at time t:
 
-QG with RGB tokens and the coherence coefficient creates a foundation for a new digital economy where value is determined not by noise, but by quality presence. This system unites physical data and semantic interpretation, providing people with a tool for more harmonious interaction with the world.
+```
+E_t = w_r * R_t + w_g * G_t + w_b * B_t
+```
+
+Accumulated score over period T:
+
+```
+Accumulated_score = ( sum over t=0..T of E_t ) * C_h * k
+```
+
+### C_h — defined in terms of the tested coherence_rate, not left open
+
+An earlier draft left `C_h` as an undefined "coherence index." This
+version defines it concretely in terms of the already-implemented and
+tested `coherence_rate` (`QG_Model_Spec.md` §3.3):
+
+```
+C_h = exp( -coherence_rate / epsilon )
+```
+
+clipped to [0, 1]. This maps a low, stable `coherence_rate` (coherent
+attention) to `C_h` near 1, and a high, erratic rate to `C_h` near 0 —
+consistent with `coherence_rate < epsilon` being the tested condition
+for minting a Coherence Token (§4). This specific mapping (the
+exponential form) is itself a proposal, not yet validated against real
+data — treat it as a starting point for calibration, not a finished
+result.
+
+### Naming conflict — "QG token" vs. PT/RT/CT
+
+**An earlier draft called the accumulated score a "QG token,"
+independent of the Presence/Resonance/Coherence tokens defined in
+`QG_Model_Spec.md` §4.** That is a fourth, unreconciled token type. Until
+this is resolved, do not treat "QG token" as a fourth issued asset —
+either (a) this accumulated score should be renamed to something
+distinct from "token" (e.g. an "Attention Accumulation Score," an
+off-chain metric feeding into PT/RT/CT issuance decisions), or (b) it
+should be shown to be equivalent to some combination of the existing
+three tokens. Neither has been done yet; this is an open reconciliation
+item, not a solved design.
+
+## Model value (as proposed, pending the reconciliation above)
+
+- Configurable channel weights could adapt the model to different
+  contexts (social platforms, educational tools, meditation practices) —
+  untested.
+- The coherence factor aims to reward quality of attention, not just
+  quantity — now tied to a concrete, tested formula (above), rather than
+  left as an undefined index.
+- 16-bit channel depth gives fine-grained input resolution; this by
+  itself does not imply "ultra-precise measurement" of anything beyond
+  the raw light signal — no claim is made about precision of any
+  inferred internal state, per the non-claim in `QG_Model_Spec.md` §1.
+
+## Conclusion
+
+This document proposes an accumulated-score extension on top of the RGB
+channels already defined and tested in `QG_Model_Spec.md`. Before this
+is treated as part of the core protocol, it needs: (1) reconciliation
+with the existing three-token model, (2) calibration of `w_r, w_g, w_b,
+k`, and the `C_h` formula against real data, and (3) removal of any
+remaining emotion/cognition framing from derivative documents (e.g. an
+earlier Medium draft used the same retired language — see
+`Executive Summary`'s non-claim section for the corrected framing to
+copy from).
+
+**Related documents:**
+- [QG_Model_Spec.md](QG_Model_Spec.md) — authoritative Presence/Resonance/Coherence definitions
+- [TOKENOMICS.md](TOKENOMICS.md) — existing PT/RT/CT token definitions, needs reconciliation with this document
