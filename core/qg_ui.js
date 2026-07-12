@@ -1,9 +1,44 @@
 /**
  * QG UI - Frontend interactions and LightHash visualization
  * Fixed: stable clock display (monospace + fixed width per segment)
+ *
+ * ============================================================
+ * PARADIGM NOTE — RGB depersonalization guarantee
+ * ============================================================
+ * Per the explicit non-claim in QG_Model_Spec.md §1: this UI does not
+ * infer emotion, cognition, or identity from screen content, and it
+ * does not retain anything that could. Concretely:
+ *   - The raw captured frame (ImageData) exists only inside
+ *     processFrame() and is discarded at the end of that function call.
+ *   - Nothing derived from a specific frame's visual content (shapes,
+ *     text, images) is ever stored, logged, or transmitted — only the
+ *     aggregate average of R, G, B across the whole sampled frame is
+ *     kept, exactly as `M` (an aggregated, depersonalized quantity) is
+ *     used elsewhere in this repository (QG_Model_Spec.md §2.2).
+ *   - No frame data leaves the browser; there are no network calls in
+ *     this file.
+ *
+ * ⚠️ OTHER OPEN ITEMS, carried over from review — not fixed here:
+ *   - The holder/creator/platform (45%/45%/10%) distribution logic
+ *     below is a working value-distribution mechanism. Per
+ *     `Executive Summary`, no token has been issued and any real
+ *     distribution scheme needs its own legal review (securities/AML
+ *     considerations vary by jurisdiction) before being used outside
+ *     of local development. Treat all balances here as an in-memory
+ *     demo, not a real asset.
+ *   - The "PoR [Ω]" value displayed to the user comes from
+ *     `qg_engine.js`'s `uPoR.computeResonance()`, which — per that
+ *     file's header — always returns `verified: true` and does not
+ *     perform real LWE-based verification. Do not present this number
+ *     to end users as a proven cryptographic result without fixing
+ *     that first.
+ *   - Screen capture takes the whole screen (`getDisplayMedia`), not a
+ *     specific window. The capture button should explain this to the
+ *     user before they click it, in any real deployment.
+ * ============================================================
  */
 
-class QGMoniitor {
+class QGMonitor {
     constructor() {
         this.timeEngine = new QGTimeEngine();
         this.transmutor = new QGTransmutor();
@@ -20,12 +55,13 @@ class QGMoniitor {
         this.lastResonance = null;
 
         // Распределение токенов 45% / 45% / 10%
+        // NOTE: demo-only in-memory accounting — see file header.
         this.distribution = {
             holder:   { share: 0.45, label: 'Держатель (ты)', r: 0, g: 0, b: 0 },
             creator:  { share: 0.45, label: 'Автор контента', r: 0, g: 0, b: 0 },
             platform: { share: 0.10, label: 'Платформа',      r: 0, g: 0, b: 0 },
         };
-        this.distributionLog = []; // хранит последние 100 записей
+        this.distributionLog = []; // хранит последние 100 записей (агрегаты, не кадры)
 
         this.initUI();
         this.startHeartbeat();
@@ -79,7 +115,6 @@ class QGMoniitor {
             .qg-seg {
                 display: inline-block;
                 text-align: center;
-                /* Фиксированная ширина под каждый сегмент */
             }
             .qg-seg-2 { min-width: 2.2ch; }
             .qg-seg-3 { min-width: 3.2ch; }
@@ -247,7 +282,7 @@ class QGMoniitor {
                     </div>
                 </div>
 
-                <!-- Лог -->
+                <!-- Лог (агрегаты, не кадры) -->
                 <div style="border:1px solid rgba(255,255,255,0.06);background:#000">
                     <div style="font-family:Arial,sans-serif;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.2);padding:0.5rem 0.75rem;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;justify-content:space-between;align-items:center">
                         <span>QG Distribution Log</span>
@@ -334,6 +369,11 @@ class QGMoniitor {
         this.canvas.height = sh;
         this.ctx.drawImage(this.video, 0, 0, this.video.videoWidth, this.video.videoHeight, 0, 0, sw, sh);
 
+        // DEPERSONALIZATION GUARANTEE: `frame` (raw pixel data) is a
+        // local variable, used only to compute the three aggregate
+        // averages below, and is discarded when this function returns.
+        // No per-pixel or frame-shaped data is stored, logged, or
+        // exposed outside this function — only avgR/avgG/avgB survive.
         const frame = this.ctx.getImageData(0, 0, sw, sh);
         let r = 0, g = 0, b = 0;
         for (let i = 0; i < frame.data.length; i += 4) {
@@ -341,12 +381,14 @@ class QGMoniitor {
         }
         const px = frame.data.length / 4;
         const avgR = r / px, avgG = g / px, avgB = b / px;
+        // `frame` is not referenced again after this point.
 
         // Seed from time only — no randomness, so R/G/B weights differ by channel
         const timeSeed = qTime.hours * 10000 + qTime.parts * 100 + qTime.fractions;
         const alpha = await this.transmutor.calculateWeights(qTime.hours, qTime.parts, qTime.fractions, timeSeed);
         this.energy = this.transmutor.calculateEnergy({ r: avgR, g: avgG, b: avgB });
 
+        // NOTE: `resonance.verified` is always true today — see file header.
         const resonance = await this.por.computeResonance(qTime, this.energy, alpha);
         this.lastResonance = resonance;
 
@@ -358,7 +400,6 @@ class QGMoniitor {
         document.getElementById('bal-r').textContent = Math.floor(this.balance.r);
         document.getElementById('bal-g').textContent = Math.floor(this.balance.g);
         document.getElementById('bal-b').textContent = Math.floor(this.balance.b);
-        // Обновляем верхние счётчики на странице
         if (typeof window.updateTopCounters === 'function') {
             window.updateTopCounters(this.distribution, this.energy);
         }
@@ -366,7 +407,7 @@ class QGMoniitor {
         document.getElementById('resonance-debug').textContent =
             `PoR [Ω]: ${resonance.omega} · X: [${resonance.x.join(', ')}]`;
 
-        // Распределение: накапливаем по долям
+        // Распределение: накапливаем по долям (демо-учёт, см. заголовок файла)
         const earned = { r: (avgR / 255) * this.energy, g: (avgG / 255) * this.energy, b: (avgB / 255) * this.energy };
         for (const [key, party] of Object.entries(this.distribution)) {
             party.r += earned.r * party.share;
@@ -374,7 +415,6 @@ class QGMoniitor {
             party.b += earned.b * party.share;
         }
 
-        // Обновляем UI распределения
         const h = this.distribution.holder, c = this.distribution.creator, p = this.distribution.platform;
         document.getElementById('dist-holder').textContent =
             `R:${Math.floor(h.r)} G:${Math.floor(h.g)} B:${Math.floor(h.b)}`;
@@ -383,7 +423,7 @@ class QGMoniitor {
         document.getElementById('dist-platform').textContent =
             `R:${Math.floor(p.r)} G:${Math.floor(p.g)} B:${Math.floor(p.b)}`;
 
-        // Пишем в лог каждые ~3 секунды (каждые ~47 кадров при 64ms)
+        // Пишем в лог каждые ~3 секунды (каждые ~47 кадров при 64ms) — агрегаты only
         this.frameCount = (this.frameCount || 0) + 1;
         if (this.frameCount % 47 === 0) {
             const t = this.timeEngine.getQGTime();
@@ -394,10 +434,9 @@ class QGMoniitor {
                 creator:  { r: Math.floor(c.r), g: Math.floor(c.g), b: Math.floor(c.b) },
                 platform: { r: Math.floor(p.r), g: Math.floor(p.g), b: Math.floor(p.b) },
             };
-            this.distributionLog.unshift(entry); // новые сверху
+            this.distributionLog.unshift(entry);
             if (this.distributionLog.length > 100) this.distributionLog.pop();
 
-            // Рендерим лог
             const logEl = document.getElementById('dist-log');
             const countEl = document.getElementById('log-count');
             countEl.textContent = `${this.distributionLog.length} записей`;
@@ -464,5 +503,5 @@ class QGMoniitor {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    window.qgMonitor = new QGMoniitor();
+    window.qgMonitor = new QGMonitor();
 });
