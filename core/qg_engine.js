@@ -1,6 +1,44 @@
 /**
  * QG Engine - Quantum Gratitude Protocol Core Logic
  * Implements Time Engine, RGB Transmutor, and uPoR
+ *
+ * ============================================================
+ * ⚠️  SECURITY WARNING — DO NOT USE AS-IS. NOT REAL CRYPTOGRAPHY.
+ * ============================================================
+ * This file predates QG_Model_Spec.md and contains THREE serious
+ * problems that make it unsafe to treat as a working security layer:
+ *
+ * 1. uPoR.commit() computes `A × r mod q` with NO noise term. Real
+ *    LWE (Learning With Errors) security depends entirely on adding
+ *    random noise: `A × r + e mod q`. Without noise, this is a plain
+ *    linear system, solvable in seconds with ordinary linear algebra
+ *    (e.g. Gaussian elimination) given a few (A, U) pairs. This
+ *    provides NO post-quantum security, or any cryptographic security
+ *    at all, despite being named after LWE.
+ *
+ * 2. getMatrixA() uses Math.random(), which is NOT a cryptographically
+ *    secure random number generator — its internal state can be
+ *    reconstructed from its outputs. Any real implementation must use
+ *    crypto.getRandomValues() (Web Crypto API) instead.
+ *
+ * 3. computeResonance() always returns `verified: true`, regardless of
+ *    input. No verification is actually performed. Any code that
+ *    checks this flag is being told a proof succeeded when nothing was
+ *    checked.
+ *
+ * Additionally:
+ * - The time hierarchy here (144/13/7/64/100) does not match the one
+ *   documented in TEMPORAL-DYNAMICS.md (144/1296/72/760/160/14000) —
+ *   these have diverged and need reconciling.
+ * - getQGTime() uses `new Date()` — ordinary system/Unix time — not the
+ *   Cs-133 physical tick count defined in QG_Model_Spec.md §2.1.
+ *
+ * Do not deploy this file, and do not treat `verified: true` as a real
+ * security guarantee anywhere it is used. See `qg_model.py` /
+ * `qgmath/qgmath.go` for the current, tested (non-cryptographic) core
+ * math — neither of those implements real LWE either; that part of the
+ * system remains genuinely unbuilt, not just undocumented.
+ * ============================================================
  */
 
 const QG_CONFIG = {
@@ -38,6 +76,8 @@ class QGTimeEngine {
     }
 
     getQGTime(date = new Date()) {
+        // NOTE: this uses ordinary system time (Date), not the Cs-133
+        // tick count from QG_Model_Spec.md §2.1. See file header.
         const localDate = new Date(date);
         const year = localDate.getFullYear();
         const month = localDate.getMonth();
@@ -109,6 +149,8 @@ class QGTransmutor {
 }
 
 class uPoR {
+    // ⚠️ NOT REAL LWE — see file header. No noise term, insecure RNG,
+    // and computeResonance() always reports verified: true.
     constructor(config = QG_CONFIG.LWE) {
         this.n = config.n;
         this.q = config.q;
@@ -116,6 +158,7 @@ class uPoR {
     }
 
     async getMatrixA() {
+        // ⚠️ Math.random() is NOT cryptographically secure. See file header.
         const size = this.m * this.n;
         const A = new Int32Array(size);
         for (let i = 0; i < size; i++) {
@@ -138,11 +181,15 @@ class uPoR {
         return {
             x: [Number(x1), Number(x2), Number(x3), Number(x4), omega],
             omega,
+            // ⚠️ Always true — no verification is actually performed.
+            // See file header. Do not treat this as a real proof result.
             verified: true
         };
     }
 
     async commit(A, r) {
+        // ⚠️ No noise term added — this is A×r mod q, not LWE.
+        // See file header for why this provides no cryptographic security.
         const U = new Int32Array(this.m);
         for (let i = 0; i < this.m; i++) {
             let sum = 0;
