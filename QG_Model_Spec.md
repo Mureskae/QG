@@ -37,6 +37,19 @@ drafts used `R` simultaneously for a state coordinate, a Merkle root, and
 a token name; that collision is retired here — the token is named
 `Resonance Token (RT)`, never `R`.)
 
+**Explicit non-claim about emotional or cognitive content.** $T_R$,
+$T_G$, $T_B$ are raw normalized light-intensity channels from a 16-bit
+capture — nothing more. Earlier drafts and public-facing text described
+them as "emotional energy," "cognitive energy," and "intuitive energy."
+That framing is retired here and should not appear in any technical
+document derived from this spec. QG makes no claim to infer a person's
+emotions, thoughts, or identity from a color signal. The claim is
+narrower and defensible: color is a universal, depersonalized physical
+signal from which an interaction metric can be constructed — not a
+window into a person's internal state. Any document (Executive Summary,
+public writeups) that still uses the emotion/cognition/intuition framing
+should be revised to match this.
+
 ### 1.1 State vector
 
 $$X = [T_R,\ T_G,\ T_B,\ M,\ T_{atom},\ J] \in [0,1]^6$$
