@@ -93,6 +93,14 @@ timestamps into TAI seconds before ticking. See `SecondsToCs133Ticks()` /
 `seconds_to_cs133_ticks()` in the reference implementation for the exact
 boundary of what is and isn't handled.
 
+*Relationship to `TIME_ENGINE_QG.md`:* that document additionally
+describes an optional tamper-evidence commitment, `C_atom = H(ticks ||
+salt)`. This is a separate quantity from `T_atom` above — a hash
+destroys numerical closeness by design, so `C_atom` cannot be substituted
+for `T_atom` inside the resonance function in §3.2. `C_atom` is a
+protocol/consensus-layer primitive, not a term in any formula in this
+document.
+
 ### 2.2 Merkle root — M
 
 `M` is the Merkle root of a session's aggregated capture data, mapped to
