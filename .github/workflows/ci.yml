@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Check Markdown files exist
         run: |
           echo "Checking required files..."
@@ -24,7 +23,6 @@ jobs:
               exit 1
             fi
           done
-
       - name: Check for empty files
         run: |
           echo "Checking for empty files..."
@@ -37,16 +35,47 @@ jobs:
             fi
           done
 
+  test-python:
+    name: Run Python reference implementation tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: pip install pytest
+      - name: Run qg_model.py test suite
+        run: python -m pytest test_qg_model.py -v
+
+  test-go:
+    name: Run Go reference implementation tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Run qgmath test suite
+        run: cd qgmath && go test ./... -v
+
   welcome:
     name: Welcome new contributors
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
-      - uses: actions/first-interaction@v1
+      # NOTE: bumped from @v1 (unmaintained) to @v3. Before relying on this,
+      # check https://github.com/actions/first-interaction for the current
+      # exact input names (e.g. pr_message vs pr-message) — these can change
+      # between major versions and a silent mismatch means the step no-ops
+      # without failing.
+      - uses: actions/first-interaction@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           pr-message: |
             👋 Thanks for your first contribution to QG!
-
             QG is a speculative space — your perspective matters here.
             A maintainer will review and respond shortly.
