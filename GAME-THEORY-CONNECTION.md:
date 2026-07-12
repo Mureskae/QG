@@ -1,63 +1,105 @@
 # Connection to Game Theory
 
-QG reframes coordination problems by shifting from classical game-theoretic assumptions toward **resonance-based alignment**.
+QG reframes coordination problems by shifting from classical game-theoretic assumptions toward **resonance-based alignment**. This document is a research note: it proposes analogies and open questions, not proven results. Where a term below is compared to an established game-theory concept, that comparison is a hypothesis to be checked, not a claim of equivalence — see "Open Research Questions" and the annotations below.
 
-## Classical Game Theory vs QG Framework
+*Note on formulas: written as plain text, not LaTeX. GitHub's math rendering (`$...$`) is inconsistent across web/app/mobile — see `QG_Model_Spec.md` for the same convention.*
 
-| Aspect                      | Classical / Traditional Game Theory                  | QG Resonance Framework                              |
-|-----------------------------|------------------------------------------------------|-----------------------------------------------------|
-| Agent model                 | Perfectly rational, utility maximizers               | Agents with presence, attention, and alignment capacity |
-| Primary solution concept    | Nash equilibrium, Subgame perfect equilibrium        | Resonance equilibrium (mutual alignment)            |
-| Payoff structure            | Often zero-sum or fixed-sum                          | Non-zero-sum, emergent from shared presence         |
-| Coordination mechanism      | Enforcement, contracts, reputation, staking          | Verifiable Proof-of-Resonance (PoR + SNARK)         |
-| Time model                  | Discrete rounds or infinite discounting              | Continuous atomic time with temporal dynamics       |
-| Information                 | Complete / incomplete information                    | Reduced asymmetry via J-space snapshots             |
-| Value creation              | Competitive advantage or cooperative bargaining      | Emergent coherence through iterated resonance       |
+## Classical game theory vs. QG framework (proposed analogy, not proven)
 
-## Core Theoretical Contributions
+| Aspect                      | Classical / Traditional Game Theory                  | QG Resonance Framework (proposed)                    |
+|-----------------------------|--------------------------------------------------------|-----------------------------------------------------|
+| Agent model                 | Perfectly rational, utility maximizers                | Agents with presence, attention, and alignment capacity |
+| Primary solution concept    | Nash equilibrium, Subgame perfect equilibrium          | "Resonance equilibrium" (proposed; not shown to be a subset, superset, or refinement of Nash equilibrium — open question) |
+| Payoff structure            | Often zero-sum or fixed-sum                            | Non-zero-sum, emergent from shared presence          |
+| Coordination mechanism      | Enforcement, contracts, reputation, staking            | Verifiable Proof-of-Resonance (see `QG_Model_Spec.md` §3–4; SNARK coverage is partial — §5.1) |
+| Time model                  | Discrete rounds or infinite discounting                | Physically-defined time via Cs-133 ticks (`QG_Model_Spec.md` §2.1); the temporal-dynamics equation below is still open, not implemented |
+| Information                 | Complete / incomplete information                      | J-space snapshots aim to reduce type-asymmetry (§2.3) — see the unresolved oracle/verifier conflict noted in `AGENTS.md` |
+| Value creation               | Competitive advantage or cooperative bargaining        | Emergent coherence through iterated resonance (proposed) |
 
-### 1. Resonance as Equilibrium Concept
-In classical theory, Nash equilibrium is a state where no player benefits from unilateral deviation.  
-In QG we propose **Resonance Equilibrium** — a state where participants achieve measurable mutual alignment (via multi-dimensional state vector including J-space).
+## Core theoretical directions (proposed, not established)
 
-Resonance equilibria can be more robust because they are grounded in verifiable presence rather than purely strategic declarations.
+### 1. Resonance as an equilibrium concept — undefined relationship to Nash equilibrium
 
-### 2. Iterated Resonance Games
-Traditional repeated games use discount factors. QG uses **atomic time** as the natural clock and J-space evolution as the state transition function:
+In classical theory, a Nash equilibrium is a state where no player
+benefits from unilateral deviation. This document proposes "Resonance
+Equilibrium" — a state of measurable mutual alignment across the state
+vector X (`QG_Model_Spec.md` §1.1). **No result here shows how Resonance
+Equilibrium relates to Nash equilibrium** — whether it is a special
+case, a different concept entirely, or something that coincides with
+Nash equilibrium under certain conditions is an open question, not
+something this document has established.
 
-\[ J(t + \Delta t) = J(t) + \delta(\Delta T_{\text{atom}}) \cdot f(\text{Resonance}(X_t)) \]
+### 2. Iterated resonance games — the evolution equation is not yet implemented
 
-This creates a dynamical system where long-term coherence becomes an attractive fixed point.
+Traditional repeated games use discount factors. This document proposes
+using atomic time (§2.1) as the clock and a J-evolution equation as the
+state-transition function:
 
-### 3. Proof-of-Resonance as New Incentive Primitive
-Instead of external incentives (tokens as carrots/sticks), PoR introduces an **internal alignment cost**.  
-Faking resonance becomes expensive because it requires consistent presence across atomic time and J-space consistency (hard to simulate convincingly).
+```
+J(t + dt) = J(t) + delta(dT_atom) * f( Resonance(X_t) )
+```
+
+**Status: open, not implemented.** `delta()` and `f()` are not defined
+anywhere in this repository. This is distinct from the tested coherence
+mechanism in `QG_Model_Spec.md` §3.3, which computes a rate of change
+(`coherence_rate`) from a sequence of already-observed J samples — that
+part is implemented and tested. The equation above, describing how J
+*generates* its own next value over time, is a separate, unresolved
+proposal. Do not conflate the two.
+
+### 3. Proof-of-Resonance as an incentive primitive
+
+Instead of external incentives (tokens as carrots/sticks), PoR proposes
+an internal alignment cost: faking resonance is expensive because it
+requires consistent presence across time and J-space (see the
+strategy-proofness sketch in `STRATEGY-PROOFNESS.md` — an informal
+argument, not a formal proof; see `QG_Model_Spec.md` §5.4).
 
 This connects to:
-- **Mechanism Design** — designing rules where truth-telling and genuine alignment are dominant strategies.
-- **Implementation Theory** — making desired social outcomes incentive-compatible through resonance proofs.
+- **Mechanism design** — designing rules where truth-telling and genuine
+  alignment are dominant strategies (see the open questions in
+  `MECHANISM-DESIGN-CONNECTION.md`).
+- **Implementation theory** — making desired social outcomes
+  incentive-compatible through resonance proofs.
 
-### 4. J-space and Bayesian Games
-J-space snapshots provide a window into the "private type" (internal state) of AI agents. This transforms many Bayesian games (with hidden information) into games with partial observability of types, potentially enabling more efficient outcomes and reducing deception.
+### 4. J-space and Bayesian games
 
-### 5. Evolutionary Perspective
-Over macro time scales, populations of agents (human + AI) can evolve under a resonance-based fitness function. This blends evolutionary game theory with dynamical systems, where "fitness" is measured by contribution to collective coherence rather than pure replication.
+J-space snapshots are proposed as a partial window into an AI agent's
+internal state, potentially turning some Bayesian games (hidden
+information) into games with partial observability of types. **Open
+problem, not solved here:** an agent that knows its J-space readout will
+be used this way has an incentive to produce a favorable readout rather
+than an honest one — see the oracle/verifier conflict-of-interest note
+in `AGENTS.md`. Partial observability does not by itself reduce
+deception if the observed signal is producible by the party being
+observed.
 
-## Open Research Questions
+### 5. Evolutionary perspective
 
-- Can resonance equilibria be computationally found or approximated efficiently?
-- What are the stability conditions for resonance vs classical Nash equilibria under perturbations?
-- How does J-space dimensionality affect the possibility of cooperation in multi-agent settings?
-- Can we design "resonance contracts" that are self-enforcing through continuous PoR verification?
-- What are the implications for AI alignment if coordination primitives are based on verifiable resonance rather than external rewards?
+Over macro time scales, populations of agents (human + AI) could in
+principle evolve under a resonance-based fitness function, blending
+evolutionary game theory with dynamical systems. This is speculative and
+has no supporting formalization in this repository yet.
+
+## Open research questions
+
+- Can resonance equilibria be computed or approximated efficiently, and how do they relate formally to Nash equilibria?
+- What are the stability conditions for resonance equilibria under perturbations?
+- How does J-space dimensionality affect cooperation in multi-agent settings?
+- Can "resonance contracts" be designed to be self-enforcing through continuous PoR verification, given the oracle conflict-of-interest problem noted above?
+- What are the implications for AI alignment if coordination primitives are based on verifiable resonance rather than external rewards — and how does that change if the verifier and the verified party can be the same agent?
 
 ---
 
-**This is an active area of exploration within the QG framework.**  
-We invite mathematicians, game theorists, and mechanism designers to critique, formalize, or extend these ideas.
+**This is an active area of exploration within the QG framework.**
+We invite mathematicians, game theorists, and mechanism designers to critique, formalize, or extend these ideas. Nothing in this document should be cited as an established result — see `QG_Model_Spec.md` for what is actually implemented and tested.
 
 **Related documents:**
 - [J-SPACE-INTEGRATION.md](J-SPACE-INTEGRATION.md)
 - [TEMPORAL-DYNAMICS.md](TEMPORAL-DYNAMICS.md)
 - [TOKENOMICS.md](TOKENOMICS.md)
 - [LAGRANGIAN-FORMULATION.md](LAGRANGIAN-FORMULATION.md)
+- [MECHANISM-DESIGN-CONNECTION.md](MECHANISM-DESIGN-CONNECTION.md)
+- [STRATEGY-PROOFNESS.md](STRATEGY-PROOFNESS.md)
+- [AGENTS.md](AGENTS.md)
+- [QG_Model_Spec.md](QG_Model_Spec.md) — authoritative for anything implemented
