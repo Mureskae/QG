@@ -60,6 +60,79 @@ def compute_j(j_lens_raw: list[float]) -> float:
     return math.tanh(l2)  # squash into (0, 1) for comparability with other terms
 
 
+@dataclass
+class OracleReading:
+    """One independent oracle's reported J value for a single event."""
+    oracle_id: str
+    j_value: float
+
+
+@dataclass
+class OracleAggregationResult:
+    aggregated_j: float
+    num_readings: int
+    outlier_oracle_ids: list[str]
+
+
+def aggregate_j_oracles(
+    readings: list[OracleReading],
+    min_quorum: int,
+    outlier_threshold: float,
+) -> OracleAggregationResult:
+    """
+    Resolve the single-oracle conflict-of-interest problem (see AGENTS.md
+    and QG_Model_Spec.md §5.1) by requiring multiple independent oracles
+    to each report J for the same event, and using the median as the
+    protocol's J value instead of trusting any single reporter.
+
+    This does NOT solve everything: it assumes the oracles are actually
+    independent (different operators/checkpoints, not the same party
+    running N instances) — verifying that independence is itself an
+    open problem (see module-level note below). What this DOES achieve:
+    an event's J value is no longer controlled by a single interested
+    party; a dishonest report must be a minority to be outvoted by the
+    median, and the median computation itself is simple, deterministic
+    arithmetic that can be SNARK-verified even though no single
+    reading's honesty can be.
+
+    Raises ValueError if fewer than min_quorum readings are supplied —
+    the event should be treated as inconclusive, not silently accepted
+    with too little data.
+    """
+    if len(readings) < min_quorum:
+        raise ValueError(
+            f"Only {len(readings)} oracle readings, need at least {min_quorum} "
+            f"(quorum not met — event should be discarded, not accepted)"
+        )
+
+    values = sorted(r.j_value for r in readings)
+    n = len(values)
+    if n % 2 == 1:
+        median = values[n // 2]
+    else:
+        median = (values[n // 2 - 1] + values[n // 2]) / 2.0
+
+    outliers = [
+        r.oracle_id for r in readings
+        if abs(r.j_value - median) > outlier_threshold
+    ]
+
+    return OracleAggregationResult(
+        aggregated_j=median,
+        num_readings=n,
+        outlier_oracle_ids=outliers,
+    )
+
+
+# OPEN PROBLEM (not solved by aggregate_j_oracles above): nothing here
+# verifies that N submitted readings actually came from N independent
+# operators rather than one party submitting N times under different
+# names (a Sybil attack on the oracle set itself). A real deployment
+# needs its own identity/reputation/staking layer for oracles — that is
+# a separate, still-unsolved design question, tracked here rather than
+# silently assumed away.
+
+
 # ---------------------------------------------------------------------------
 # 3. Presence and Resonance
 # ---------------------------------------------------------------------------
