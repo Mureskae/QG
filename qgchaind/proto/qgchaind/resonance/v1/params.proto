@@ -1,0 +1,14 @@
+syntax = "proto3";
+package qgchaind.resonance.v1;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "qgchaind/x/resonance/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "qgchaind/x/resonance/Params";
+  option (gogoproto.equal) = true;
+  
+}

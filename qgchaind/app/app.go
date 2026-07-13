@@ -46,6 +46,7 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
 	"qgchaind/docs"
+	resonancemodulekeeper "qgchaind/x/resonance/keeper"
 )
 
 const (
@@ -98,7 +99,8 @@ type App struct {
 	TransferKeeper      ibctransferkeeper.Keeper
 
 	// simulation manager
-	sm *module.SimulationManager
+	sm              *module.SimulationManager
+	ResonanceKeeper resonancemodulekeeper.Keeper
 }
 
 func init() {
@@ -178,6 +180,7 @@ func New(
 		&app.ConsensusParamsKeeper,
 		&app.CircuitBreakerKeeper,
 		&app.ParamsKeeper,
+		&app.ResonanceKeeper,
 	); err != nil {
 		panic(err)
 	}
