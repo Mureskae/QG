@@ -7,3 +7,7 @@ release/
 *.dot
 *.log
 *.ign
+build_errors.txt
+fix.py
+qgchaind
+*.swp
