@@ -11,3 +11,4 @@ build_errors.txt
 fix.py
 qgchaind
 *.swp
+test_output.txt
